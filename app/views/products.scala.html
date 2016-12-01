@@ -1,0 +1,244 @@
+@import sorm.Persisted
+@(currentPage: Page[Items with Persisted], currentOrderBy: Int, currentFilter: String)
+@prod = @{currentPage.items}
+@count = @{currentPage.items.length - 1}
+@formStat = @{if(currentPage.offset > 0){"hidden"}else{null}}
+@****************************************
+* Helper generating navigation links    *
+****************************************@
+@link(newPage: Int, newOrderBy: Option[Int] = None) = @{
+    routes.HomeController.list(newPage, newOrderBy.map { orderBy =>
+        if(orderBy == scala.math.abs(currentOrderBy)) -currentOrderBy else orderBy
+    }.getOrElse(currentOrderBy), currentFilter)
+
+}
+
+    @**********************************
+    * Helper generating table headers *
+    ***********************************@
+@header(orderBy: Int, title: String) = {
+    <th class="col@orderBy header @if(scala.math.abs(currentOrderBy) == orderBy) @{if(currentOrderBy < 0) "headerSortDown" else "headerSortUp"}">
+        <a href="assets/products/@link(0, Some(orderBy))">@title</a>
+    </th>
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>3 Col Portfolio - Start Bootstrap Template</title>
+
+            <!-- Bootstrap Core CSS -->
+        <link href="assets/products/css/bootstrap.min.css" rel="stylesheet">
+
+            <!-- Custom CSS -->
+        <link href="assets/products/css/3-col-portfolio.css" rel="stylesheet">
+
+            <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+            <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+            <!--[if lt IE 9]>
+
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+
+    <![endif]-->
+        <style>
+            .stylish-input-group .input-group-addon{
+                background: white !important;
+            }
+            .stylish-input-group .form-control{
+                border-right:0;
+                box-shadow:0 0 0;
+                border-color:#ccc;
+            }
+            .stylish-input-group button{
+                border:0;
+                background:transparent;
+            }
+        </style>
+    </head>
+
+    <body>
+
+            <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="@routes.HomeController.index()">Optium</a>
+                </div>
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a href="assets/products/#">Home</a>
+                        </li>
+                        <li>
+                            <a href="@routes.HomeController.list()">Products</a>
+                        </li>
+                        <li hidden>
+                            <a href="assets/products/#">Contact</a>
+                        </li>
+                    </ul>
+                </div>
+                    <!-- /.navbar-collapse -->
+            </div>
+                <!-- /.container -->
+        </nav>
+
+            <!-- Page Content -->
+        <div class="container">
+
+                <!-- Page Header -->
+            <div class="row">
+                <div class="col-lg-6">
+                    <h1 class="page-header">Page Heading</h1>
+                </div>
+
+                <div class="col-lg-12">
+                    <form method="get" action="@routes.HomeController.list()">
+                        <div id="imaginary_container">
+                            <div class="input-group stylish-input-group">
+                                <input type="text" id="searchbox" name="f" class="form-control" value="@currentFilter" placeholder="Search" >
+                                <span class="input-group-addon">
+                                    <button type="submit" id="searchsubmit" value="Filter by name">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+            <br>
+                <!-- /.row -->
+
+                <!-- Projects Row -->
+
+            <form class="form-horizontal" role="form" action="@routes.DBController.addOrder()" method="post" id="order">
+
+                <div class="bs-example">
+
+                            <div class="form-group">
+                                <div class="col-sm-4" @(formStat)><input type="text" class="form-control" name="name" placeholder="Name"></div>
+                                <div class="col-sm-4" @(formStat)><input type="text" class="form-control" name="address" placeholder="address"></div>
+                                <div class="col-sm-4" @(formStat)><input type="text" class="form-control" name="pDay" placeholder="Day"></div>
+                            </div>
+
+                            <br>
+
+                            @for(n <- 0 to count){
+                                <div class="col-md-4 portfolio-item">
+                                    <a href="assets/products/#">
+                                        <img class="img-responsive" src="http://placehold.it/700x400" alt="">
+                                    </a>
+                                    <h3>
+                                        <a href="assets/products/#" >@prod.apply(n).name</a>
+                                    </h3>
+                                    <h5>
+                                        @prod.apply(n).price
+                                    </h5>
+                                    <p2><h5><input type="checkbox" id="@("item"+n)" name="item[@(n)]" value="@(prod.apply(n).name + "," + prod.apply(n).price)">  <input type="number" id="@("nItems"+n)" name="nItems[@(n)]" disabled="" min="0"></h5></p2>
+                                    <p>@prod.apply(n).description</p>
+                                </div>
+                            }
+                </div>
+
+                <div class="col-lg-12">
+                <button type="submit">Submit</button>
+                </div>
+
+
+
+                <!-- /.row -->
+
+            <hr>
+
+                <!-- Pagination -->
+            <div id="pagination" class="pagination col-md-12">
+                <ul>
+                    @currentPage.prev.map { page =>
+                    <li class="prev">
+                        <a href="assets/products/@link(page)">&larr; Previous</a>
+                    </li>
+                    }.getOrElse {
+                        <li class="prev disabled">
+                            <a>&larr; Previous</a>
+                        </li>
+                    }
+                    <li class="current">
+                        <a>Displaying @(currentPage.offset + 1) to @(currentPage.offset + currentPage.items.size) of @currentPage.total</a>
+                    </li>
+                    @currentPage.next.map { page =>
+                    <li class="next">
+                        <a href="@link(page)" id="nextP">Next &rarr;</a>
+
+                    </li>
+                    }.getOrElse {
+                        <li class="next disabled">
+                            <a>Next &rarr;</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+
+            </form>
+                <!-- /.row -->
+
+            <hr>
+
+                <!-- Footer -->
+            <footer>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <p>Copyright &copy; Your Website 2014</p>
+                    </div>
+                </div>
+                    <!-- /.row -->
+            </footer>
+
+        </div>
+            <!-- /.container -->
+
+            <!-- jQuery -->
+        <script src="assets/products/js/jquery.js"></script>
+
+            <!-- Bootstrap Core JavaScript -->
+        <script src="js/bootstrap.min.js"></script>
+
+        <script>
+                $(document).ready(function() {
+                    @for(n <- 0 to count){
+                        $('#item'+@n).change(function(){
+                            $("#nItems"+@n).prop("disabled", !$(this).is(':checked'));
+                        });
+                    }
+
+                    $("#nextP").click(function(){
+                        $.post("/next", $("#order").serialize(), function(data) {
+                            alert(data);
+                        });
+                    });
+
+                });
+        </script>
+
+    </body>
+
+</html>

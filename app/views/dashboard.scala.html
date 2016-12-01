@@ -1,0 +1,365 @@
+@import sorm._
+@import models.{DB, Order, Orders}
+
+@stocks = @{DB.query[Stocks].fetch()}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+
+        <link href="assets/dashboard/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+            <!-- MetisMenu CSS -->
+        <link href="assets/dashboard/vendor/metisMenu/metisMenu.min.css" rel="stylesheet">
+
+            <!-- DataTables CSS -->
+        <link href="assets/dashboard/vendor/datatables-plugins/dataTables.bootstrap.css" rel="stylesheet">
+
+            <!-- DataTables Responsive CSS -->
+        <link href="assets/dashboard/vendor/datatables-responsive/dataTables.responsive.css" rel="stylesheet">
+
+            <!-- Custom CSS -->
+        <link href="assets/dashboard/dist/css/sb-admin-2.css" rel="stylesheet">
+
+            <!-- Custom Fonts -->
+        <link href="assets/dashboard/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    </head>
+    <body>
+
+            <!-- HEADER -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                    <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="@routes.HomeController.index()">Optium</a>
+                </div>
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a href="@routes.HomeController.index()">Home</a>
+                        </li>
+                        <li>
+                            <a href="@routes.HomeController.list()">Products</a>
+                        </li>
+                        <li>
+                            <a href="assets/products/#">Contact</a>
+                        </li>
+                        <li class="left">
+                            <a href="@routes.HomeController.logOut()">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+                    <!-- /.navbar-collapse -->
+            </div>
+                <!-- /.container -->
+        </nav>
+            <!-- /HEADER -->
+
+        <br>
+        <br>
+        <br>
+
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2>Unconfirmed Orders</h2>
+                    </div>
+
+                    <form method="post" action="@routes.DBController.checkBox()">
+                            <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example-1">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Order</th>
+                                        <th>Pick-Up Day</th>
+                                        <th>Total Price</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                @for(n <- DB.query[Order].fetch()){
+
+                                    <tr>
+                                        <td>@(n.id)</td>
+                                        <td>@(n.name)</td>
+                                        <td>@(n.address)</td>
+                                        <td>@for(i <- n.item){
+                                            <li>@i.mkString(",")</li>
+                                        }
+                                        </td>
+                                        <td>@(n.pDay)</td>
+                                        <td>@(n.price)</td>
+                                        <td><input type="checkbox" name="stat[@(DB.query[Order].fetch().indexOf(n))]" value="@(DB.query[Order].fetch().indexOf(n))"></td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                        <input type="submit" hidden onkeypress="enter()">
+                    </form>
+                        <!-- /.panel-body -->
+                </div>
+                    <!-- /.panel -->
+            </div>
+                <!-- /.col-lg-12 -->
+
+            <div class="col-lg-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2>Confirmed Orders</h2>
+                    </div>
+
+                    <form method="post" action="@routes.DBController.checkBox2()">
+                            <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example-2">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Name</th>
+                                        <th>Address</th>
+                                        <th>Order</th>
+                                        <th>Pick-Up Day</th>
+                                        <th>Total Price</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                @for(n <- DB.query[Orders].fetch()){
+
+                                    <tr>
+                                        <td>@(n.id)</td>
+                                        <td>@(n.name)</td>
+                                        <td>@(n.address)</td>
+                                        <td>@for(i <- n.item){
+                                            <li>@i.mkString(",")</li>
+                                        }
+                                        </td>
+                                        <td>@(n.pDay)</td>
+                                        <td>@(n.price)</td>
+                                        <td><input type="checkbox" name="stat[@(DB.query[Orders].fetch().indexOf(n))]" value="@(DB.query[Orders].fetch().indexOf(n))"></td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                        <input type="submit" hidden onkeypress="enter()">
+                    </form>
+                        <!-- /.panel-body -->
+                </div>
+                    <!-- /.panel -->
+            </div>
+
+            <div class="col-lg-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2>Products</h2>
+                    </div>
+
+                    <form method="post" action="@routes.DBController.checkBox3()">
+                            <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example-3">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Code</th>
+                                        <th>Price</th>
+                                        <th>Description</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                @for(n <- DB.query[Items].fetch()){
+
+                                    <tr>
+                                        <td>@(n.name)</td>
+                                        <td>@(n.code)</td>
+                                        <td class="center">@(n.price)</td>
+                                        <td>@(n.description)</td>
+                                        <td><input type="checkbox" name="stat[@(DB.query[Items].fetch().indexOf(n))]" value="@(DB.query[Items].fetch().indexOf(n))"></td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                        <input type="submit" hidden onkeypress="enter()">
+                    </form>
+                        <!-- /.panel-body -->
+                </div>
+                    <!-- /.panel -->
+            </div>
+                <!-- /.col-lg-4 -->
+
+        </div>
+
+
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2>Stock</h2>
+                    </div>
+                            <!-- /.panel-heading -->
+                        <div class="panel-body">
+                            <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example-4">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Quantity</th>
+                                        <th>Sold</th>
+                                        <th>Returned</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                @for(n <- DB.query[Stocks].fetch()){
+
+                                    <tr>
+                                        <td>@(n.name)</td>
+                                        <td>@(n.quantity)</td>
+                                        <td class="center">@(n.sold)</td>
+                                        <td>@(n.returned)</td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- /.panel-body -->
+                </div>
+                    <!-- /.panel -->
+            </div>
+
+                <!-- Basic Form -->
+            <div class="panel panel-blue margin-bottom-40 col-lg-4">
+                <div class="panel-heading">
+                    <h3 class="panel-title"><i class="fa fa-tasks"></i> Add Item </h3>
+                </div>
+                <div class="panel-body">
+                    <form class="margin-bottom-40" role="form" action="@routes.DBController.addItem()" method="post">
+                        <div class="form-group">
+                            <label for="ItemName">Item Name</label>
+                            <input type="text" class="form-control" name="name" id="item" placeholder="Item name">
+
+                            <label for="code">Code</label>
+                            <input type="text" class="form-control" name="code" id="code" placeholder="Item code">
+
+                            <label for="price">Price</label>
+                            <input type="number" class="form-control" name="price" id="price" placeholder="Item price" min="0">
+                        </div>
+
+                        <div class="text-area">
+                            <textarea rows="4" cols="50" name="description" id="description"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-u btn-u-blue">Submit</button>
+                    </form>
+                </div>
+            </div>
+                <!-- End Basic Form -->
+
+            <div class="col-lg-4">
+                <form action="@routes.DBController.sEdit()" method="post">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2>Stock Edit</h2>
+                    </div>
+                        <!-- /.panel-heading -->
+                    <div class="panel-body">
+                        <table width="100%" class="table table-striped table-bordered table-hover" id="dataTables-example-5">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Quantity</th>
+                                    <th>Returned</th>
+                                    <th>Select</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @for(n <- 0 until stocks.size){
+
+                                <tr>
+                                    <td>@(stocks.apply(n).name)</td>
+                                    <td><input type="number" name="quantity[@(n)]" id="@("quantity"+n)" disabled=""></td>
+                                    <td><input type="number" name="returned[@(n)]" id="@("returned"+n)" disabled=""></td>
+                                    <td><input type="checkbox" name="id[@(n)]" value="@(stocks.apply(n).id)" id=@("check"+n)></td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                        <!-- /.panel-body -->
+                </div>
+                    <!-- /.panel -->
+                    <input type="submit" hidden onkeypress="enter()">
+                </form>
+            </div>
+        </div>
+
+
+        <!-- jQuery -->
+        <script src="assets/dashboard/vendor/jquery/jquery.min.js"></script>
+
+            <!-- Bootstrap Core JavaScript -->
+        <script src="assets/dashboard/vendor/bootstrap/js/bootstrap.min.js"></script>
+
+            <!-- Metis Menu Plugin JavaScript -->
+        <script src="assets/dashboard/vendor/metisMenu/metisMenu.min.js"></script>
+
+            <!-- DataTables JavaScript -->
+        <script src="assets/dashboard/vendor/datatables/js/jquery.dataTables.min.js"></script>
+        <script src="assets/dashboard/vendor/datatables-plugins/dataTables.bootstrap.min.js"></script>
+        <script src="assets/dashboard/vendor/datatables-responsive/dataTables.responsive.js"></script>
+
+            <!-- Custom Theme JavaScript -->
+        <script src="assets/dashboard/dist/js/sb-admin-2.js"></script>
+
+            <!-- Page-Level Demo Scripts - Tables - Use for reference -->
+        <script>
+    $(document).ready(function() {
+        $('#dataTables-example-1').DataTable({
+            responsive: true
+        });
+
+        $('#dataTables-example-2').DataTable({
+            responsive: true
+        });
+
+        $('#dataTables-example-3').DataTable({
+            responsive: true
+        });
+
+        $('#dataTables-example-4').DataTable({
+            responsive: true
+        });
+
+        $('#dataTables-example-5').DataTable({
+            responsive: true
+        });
+
+        @for(n <- 0 until stocks.size){
+            $('#check'+@n).change(function(){
+                $("#quantity"+@n).prop("disabled", !$(this).is(':checked'));
+                $("#returned"+@n).prop("disabled", !$(this).is(':checked'));
+            });
+        }
+
+    });
+</script>
+
+    </body>
+</html>
