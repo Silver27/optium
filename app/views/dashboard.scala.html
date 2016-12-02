@@ -250,7 +250,8 @@
                     <h3 class="panel-title"><i class="fa fa-tasks"></i> Add Item </h3>
                 </div>
                 <div class="panel-body">
-                    <form class="margin-bottom-40" role="form" action="@routes.DBController.addItem()" method="post">
+                @helper.form(action = routes.DBController.addItem(), 'enctype -> "multipart/form-data") {
+                    <div class="margin-bottom-40" role="form" action="@routes.DBController.addItem()" method="post">
                         <div class="form-group">
                             <label for="ItemName">Item Name</label>
                             <input type="text" class="form-control" name="name" id="item" placeholder="Item name">
@@ -260,6 +261,9 @@
 
                             <label for="price">Price</label>
                             <input type="number" class="form-control" name="price" id="price" placeholder="Item price" min="0">
+
+                            <label for="price">Picture</label>
+                            <input type="file" class="form-control" name="picture" id="picture">
                         </div>
 
                         <div class="text-area">
@@ -267,8 +271,9 @@
                         </div>
 
                         <button type="submit" class="btn-u btn-u-blue">Submit</button>
-                    </form>
+                    </div>
                 </div>
+                }
             </div>
                 <!-- End Basic Form -->
 
