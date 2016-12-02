@@ -146,7 +146,7 @@
                             @for(n <- 0 to count){
                                 <div class="col-md-4 portfolio-item">
                                     <a href="assets/products/#">
-                                        <img class="img-responsive" src="http://placehold.it/700x400" alt="">
+                                        <img class="img-responsive" src="@(prod.apply(n).url)" alt="">
                                     </a>
                                     <h3>
                                         <a href="assets/products/#" >@prod.apply(n).name</a>
