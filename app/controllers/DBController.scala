@@ -7,10 +7,25 @@ import play.api.data.Forms._
 import play.api.mvc._
 import sorm.Persisted
 import play.api.data.format.Formats._
+import com.amazonaws.services.s3.AmazonS3Client
+import com.amazonaws.auth.BasicAWSCredentials
+import com.amazonaws.ClientConfiguration
 /**
   * Created by gabriel on 11/5/16.
   */
 class DBController extends Controller{
+
+  val imgBucket = "product-images"
+  val access = "AI_E8-PMD2FJZILDUDPF"
+  val secret = "XhrMKfFKa8UJf81Pavg7dtkp9npuCTPmXq3EfQ=="
+
+  val opts = new ClientConfiguration()
+  opts.setSignerOverride("S3SignerType")
+
+  val aws_credentials = new BasicAWSCredentials(access, secret)
+  val client = new AmazonS3Client(aws_credentials, opts)
+
+  client.setEndpoint("cellar.services.clever-cloud.com")
 
   var o1 = ""
   var o2 = ""
@@ -93,16 +108,21 @@ class DBController extends Controller{
     }
   }
 
-  def addItem = Action /*(parse.multipartFormData)*/ {implicit request =>
+  def addItem = Action (parse.multipartFormData) {implicit request =>
 
-    //val picture = request.body.file("picture").get.ref.file
+    val picture = request.body.file("picture").get.ref.file
 
     val items = itemForm.bindFromRequest.get
+
+    val modItem = Items.apply(items.name, items.code + client.getUrl(imgBucket, access), items.price, items.description)
+
     val stocks = Stocks.apply(items.name, 0, 0, 0)
+
+    client.putObject(imgBucket, items.code, picture)
 
     if(request.cookies.get("name").get.value.equals("manager") && request.cookies.get("password").get.value.equals("manager")) {
       DB.save(stocks)
-      DB.save(items)
+      DB.save(modItem)
       Redirect(routes.HomeController.dashBoard())
     }else{Redirect(routes.HomeController.index())}
   }
