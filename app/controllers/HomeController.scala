@@ -35,7 +35,9 @@ class HomeController extends Controller {
 
 
   def dashBoard = Action{ implicit request =>
-    Ok(views.html.dashboard())
+    if(request.cookies.get("name").get.value.equals("manager") && request.cookies.get("password").get.value.equals("manager")) {
+      Ok(views.html.dashboard())
+    }else{Redirect(routes.HomeController.index())}
   }
 
   def userAuth = Action{ implicit request =>
