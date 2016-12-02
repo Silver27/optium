@@ -10,6 +10,8 @@ import play.api.data.format.Formats._
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.ClientConfiguration
+import com.amazonaws.services.s3.model.{CannedAccessControlList, PutObjectRequest}
+
 /**
   * Created by gabriel on 11/5/16.
   */
@@ -58,13 +60,13 @@ class DBController extends Controller{
     )
   }
 
-  val itemForm: Form[Items] = Form{
-    mapping(
+  val itemForm = Form{
+    tuple(
       "name" -> text,
       "code" -> text,
       "price" -> of[Double],
       "description" -> text
-    )(Items.apply)(Items.unapply)
+    )
   }
 
   def next(page: Int, orderBy: Int, filter: String)= Action{implicit request =>
@@ -112,17 +114,20 @@ class DBController extends Controller{
 
     val picture = request.body.file("picture").get.ref.file
 
-    val items = itemForm.bindFromRequest.get
+    val i = itemForm.bindFromRequest.get
 
-    val modItem = Items.apply(items.name, items.code + client.getUrl(imgBucket, access), items.price, items.description)
+    val objectRequest:PutObjectRequest = new PutObjectRequest(imgBucket, i._2, picture)
+    objectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
+
+    val items = Items.apply(i._1, i._2, i._3, i._4, client.getResourceUrl(imgBucket, i._2))
+
+    println(client.getResourceUrl(imgBucket, i._2))
 
     val stocks = Stocks.apply(items.name, 0, 0, 0)
 
-    client.putObject(imgBucket, items.code, picture)
-
     if(request.cookies.get("name").get.value.equals("manager") && request.cookies.get("password").get.value.equals("manager")) {
       DB.save(stocks)
-      DB.save(modItem)
+      DB.save(items)
       Redirect(routes.HomeController.dashBoard())
     }else{Redirect(routes.HomeController.index())}
   }
@@ -145,7 +150,6 @@ class DBController extends Controller{
       for(n <- n.item.apply(0)){
         DB.query[Stocks].whereEqual("name", n._1).fetch().map(item => item.copy(quantity = item.quantity - n._2, sold = item.sold + n._2)).map(DB.save)
       }
-      //DB.save(DB.query[Stocks].whereEqual("name", n.name).fetch().map(item => item.quantity))
       val sa = Orders.apply(n.name, n.address, n.pDay, n.item, n.price)
       DB.delete(n)
       DB.save(sa)
@@ -168,14 +172,14 @@ class DBController extends Controller{
 
     val dItems = (for(n <- 0 to a.length-1)yield{DB.query[Items].fetch().apply(a(n))}).toList
     val dStocks = for(n <- dItems)yield {n.name}
-    val stocks = for(n <- DB.query[Stocks].fetch())yield{}
-    /*
-    val c = for(n <- b)yield{
-      val m = Map("name" -> n.name, "code" -> n.code, "price" -> n.price, "description" -> n.description)
-      val sa = Items.apply(n.name, n.code, n.price, n.description)
-      DB.delete(n)
+    val stocks = for(n <- DB.query[Stocks].fetch() if dStocks.contains(n.name))yield{n}
+
+    val delete = for(n <- 0 until dItems.size)yield{
+      client.deleteObject(imgBucket, dItems(n).code)
+      DB.delete(dItems(n))
+      DB.delete(stocks(n))
     }
-    */
+
     Ok(views.html.dashboard())
   }
 
