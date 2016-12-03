@@ -26,7 +26,9 @@ class DBController extends Controller{
 
   val aws_credentials = new BasicAWSCredentials(access, secret)
   val client = new AmazonS3Client(aws_credentials, opts)
-
+  
+  client.setBucketAcl(imgBucket, CannedAccessControlList.PublicRead)
+ 
   client.setEndpoint("cellar.services.clever-cloud.com")
 
   var o1 = ""
