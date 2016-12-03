@@ -17,7 +17,7 @@ import com.amazonaws.services.s3.model.{CannedAccessControlList, PutObjectReques
   */
 class DBController extends Controller{
 
-  val imgBucket = "product-images"
+  val imgBucket = "products"
   val access = "AI_E8-PMD2FJZILDUDPF"
   val secret = "XhrMKfFKa8UJf81Pavg7dtkp9npuCTPmXq3EfQ=="
 
