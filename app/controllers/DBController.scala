@@ -10,7 +10,6 @@ import play.api.data.format.Formats._
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.ClientConfiguration
-import com.amazonaws.services.s3.model.{CannedAccessControlList, PutObjectRequest}
 
 /**
   * Created by gabriel on 11/5/16.
