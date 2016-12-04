@@ -121,11 +121,9 @@ class DBController extends Controller{
     val objectRequest:PutObjectRequest = new PutObjectRequest(imgBucket, i._2 + ".jpg", picture)
     objectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
     
-    client.putObject(imgBucket, i._2, picture)
+    client.putObject(imgBucket, i._2 + ".jpg", picture)
 
     val items = Items.apply(i._1, i._2, i._3, i._4, client.getResourceUrl(imgBucket, objectRequest.getKey))
-
-    println(client.getResourceUrl(imgBucket, objectRequest.getKey))
 
     val stocks = Stocks.apply(items.name, 0, 0, 0)
 
