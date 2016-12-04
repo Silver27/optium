@@ -25,9 +25,8 @@ class DBController extends Controller{
 
   val aws_credentials = new BasicAWSCredentials(access, secret)
   val client = new AmazonS3Client(aws_credentials, opts)
-  
-  client.setBucketAcl(imgBucket, CannedAccessControlList.PublicRead)
- 
+
+
   client.setEndpoint("cellar.services.clever-cloud.com")
 
   var o1 = ""
@@ -95,11 +94,11 @@ class DBController extends Controller{
 
     orderTemp = orderReset
 
-      DB.save(order)
+    DB.save(order)
 
-      println(order)
+    println(order)
 
-      Ok(views.html.products(Pagination.list(page = page, orderBy = orderBy, filter = ("%"+filter+"%")), orderBy, filter))
+    Ok(views.html.products(Pagination.list(page = page, orderBy = orderBy, filter = ("%"+filter+"%")), orderBy, filter))
   }
 
   def deleteOrder = Action { implicit request =>
@@ -117,13 +116,10 @@ class DBController extends Controller{
 
     val i = itemForm.bindFromRequest.get
 
-    val objectRequest:PutObjectRequest = new PutObjectRequest(imgBucket, i._2 + ".jpg", picture)
-    objectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
-    
     client.putObject(imgBucket, i._2 + ".jpg", picture)
 
-    val items = Items.apply(i._1, i._2, i._3, i._4, client.getResourceUrl(imgBucket, objectRequest.getKey))
-
+    val items = Items.apply(i._1, i._2, i._3, i._4, client.getResourceUrl(imgBucket, i._2 + ".jpg"))
+    
     val stocks = Stocks.apply(items.name, 0, 0, 0)
 
     if(request.cookies.get("name").get.value.equals("manager") && request.cookies.get("password").get.value.equals("manager")) {
