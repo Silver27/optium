@@ -92,13 +92,16 @@ class DBController extends Controller{
 
     val order = if (o._1 != "" && o._2 != "" && o._3 != "") {Order.apply(o._1, o._2, o._3, m, price)}else{Order.apply(ord._1, ord._2, ord._3, m, price)}
 
-    orderTemp = orderReset
+    if(order.name != "" && order.address != "" && order.pDay != "") {
+      orderTemp = orderReset
 
-    DB.save(order)
+      DB.save(order)
 
-    println(order)
+      println(order)
 
-    Ok(views.html.products(Pagination.list(page = page, orderBy = orderBy, filter = ("%"+filter+"%")), orderBy, filter))
+      Ok(views.html.products(Pagination.list(page = page, orderBy = orderBy, filter = ("%" + filter + "%")), orderBy, filter))
+    }else{Ok(views.html.products(Pagination.list(page = page, orderBy = orderBy, filter = ("%" + filter + "%")), orderBy, filter))}
+    
   }
 
   def deleteOrder = Action { implicit request =>
