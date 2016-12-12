@@ -85,13 +85,10 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li>
-                            <a href="assets/products/#">Home</a>
+                            <a href="@routes.HomeController.index()">Home</a>
                         </li>
                         <li>
                             <a href="@routes.HomeController.list()">Products</a>
-                        </li>
-                        <li hidden>
-                            <a href="assets/products/#">Contact</a>
                         </li>
                     </ul>
                 </div>
@@ -145,7 +142,7 @@
 
                             @for(n <- 0 to count){
                                 <div class="col-md-4 portfolio-item">
-                                    <a href="assets/products/#">
+                                    <a href="@(prod.apply(n).url)">
                                         <img class="img-responsive" src="@(prod.apply(n).url)" alt="">
                                     </a>
                                     <h3>
