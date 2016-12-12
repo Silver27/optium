@@ -10,6 +10,7 @@ import play.api.data.format.Formats._
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.ClientConfiguration
+import com.amazonaws.services.s3.model._;
 
 /**
   * Created by gabriel on 11/5/16.
@@ -26,6 +27,8 @@ class DBController extends Controller{
   val aws_credentials = new BasicAWSCredentials(access, secret)
   val client = new AmazonS3Client(aws_credentials, opts)
 
+  val acl = new AccessControlList()
+  acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);
 
   client.setEndpoint("cellar.services.clever-cloud.com")
 
@@ -118,7 +121,7 @@ class DBController extends Controller{
 
     val picture = request.body.file("picture").get.ref.file
 
-    client.putObject(imgBucket, i._2 + ".jpg", picture)
+    client.putObject(new PutObjectRequest(imgBucket, i._2 + ".jpg", picture).withAccessControlList(acl))
 
     val items = Items.apply(i._1, i._2, i._3, i._4, client.getResourceUrl(imgBucket, i._2 + ".jpg"))
     
