@@ -125,11 +125,11 @@ class DBController extends Controller{
     
     val stocks = Stocks.apply(items.name, 0, 0, 0)
 
-    if(request.cookies.get("name").get.value.equals("manager") && request.cookies.get("password").get.value.equals("manager")) {
+    if(request.cookies.get("name").get.value.equals("manager") && request.cookies.get("password").get.value.equals("manager") && items.name != "" && items.code != "" && items.price != null) {
       DB.save(stocks)
       DB.save(items)
       Redirect(routes.HomeController.dashBoard())
-    }else{Redirect(routes.HomeController.index())}
+    }else{Redirect(routes.HomeController.dashBoard())}
   }
 
   def deleteItem = Action{ implicit request =>
