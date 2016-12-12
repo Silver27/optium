@@ -114,10 +114,17 @@ class DBController extends Controller{
   }
 
   def addItem = Action (parse.multipartFormData) {implicit request =>
-
-    val picture = request.body.file("picture").get.ref.file
-
     val i = itemForm.bindFromRequest.get
+
+    import java.io.File
+    request.body.file("picture").map { pic =>
+        import java.io.File
+        val filename = i._2
+        val contentType = pic.contentType
+        picture.ref.moveTo(new File(s"/images/$filename"))
+    }
+   
+    val picture = request.body.file("picture").get.ref.file
 
     client.putObject(imgBucket, i._2 + ".jpg", picture)
 
