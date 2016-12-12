@@ -133,7 +133,7 @@
 
                             <div class="form-group">
                                 <div class="col-sm-4" @(formStat)><input type="text" class="form-control" name="name" placeholder="Name"></div>
-                                <div class="col-sm-4" @(formStat)><input type="number" class="form-control" name="address" placeholder="Contact No."></div>
+                                <div class="col-sm-4" @(formStat)><input class="form-control" name="address" onkeypress="return isNumeric(event)" oninput="maxLengthCheck(this)" type = "number" placeholder="Contact No." min = "11111111111" max = "99999999999" /></div>
                                 <div class="col-sm-4" @(formStat)><input type="text" class="form-control" name="pDay" placeholder="Day"></div>
                             </div>
 
@@ -234,7 +234,25 @@
 
                 });
         </script>
+    
+        <script>
+                function maxLengthCheck(object) {
+                    if (object.value.length > object.max.length)
+                        object.value = object.value.slice(0, object.max.length)
+                }
 
+                function isNumeric (evt) {
+                    var theEvent = evt || window.event;
+                    var key = theEvent.keyCode || theEvent.which;
+                    key = String.fromCharCode (key);
+                    var regex = /[0-9]|\./;
+                    if ( !regex.test(key) ) {
+                        theEvent.returnValue = false;
+                        if(theEvent.preventDefault) theEvent.preventDefault();
+                    }
+                }
+        </script>
+    
     </body>
 
 </html>
